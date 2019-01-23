@@ -8,10 +8,11 @@
         varying vec3 vColor;
         uniform float counter;
         uniform float u_time;
+        uniform mat4 objectMatrix;
 
         void main() {
 
-            gl_Position = vec4(0.5*sin(position*sin(counter*0.01) + counter*0.1), 1.0);
+            gl_Position = objectMatrix * vec4(position, 1.0);
             vColor = color;
 
         }
@@ -25,6 +26,8 @@
             gl_FragColor = vec4(vColor, 1.0);
         }
     </script>
+
+    <script type="text/javascript" src="gl-matrix-min.js"></script>
 
     <script type="text/javascript">
         var gl, canvas;
@@ -164,7 +167,13 @@
             var uLocation = gl.getUniformLocation(program, "counter");
             gl.uniform1f(uLocation, ++frameCounter);
 
-
+            var objectMatrix = mat4.create();
+            mat4.identity(objectMatrix);
+            mat4.rotateZ(objectMatrix,objectMatrix,++frameCounter*0.01)
+            mat4.rotateX(objectMatrix,objectMatrix,++frameCounter*0.01)
+            mat4.rotateY(objectMatrix,objectMatrix,++frameCounter*0.01)
+            var objectMatrixLocation = gl.getUniformLocation(program, "objectMatrix");
+            gl.uniformMatrix4fv(objectMatrixLocation, false, objectMatrix);
 
 
 
