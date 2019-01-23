@@ -4,10 +4,12 @@
     <title>WebGL</title>
     <script id="vertexShader" type="text/vertex-code">
         attribute vec3 position;
+        attribute vec3 color;
         varying vec3 vColor;
         void main() {
             gl_Position = vec4(position, 1.0);
-            vColor = vec3(position);
+            vColor = color;
+
         }
 
     </script>
@@ -68,7 +70,7 @@
             */
 
             type === gl.VERTEX_SHADER ? shader = gl.createShader(gl.VERTEX_SHADER) :
-                                        shader = gl.createShader(gl.FRAGMENT_SHADER)
+                shader = gl.createShader(gl.FRAGMENT_SHADER)
             gl.shaderSource(shader, codeStr);
             gl.compileShader(shader);
             if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
@@ -76,7 +78,7 @@
             return shader;
         }
 
-        var positionBuffer, program;
+        var positionBuffer, program,colorBuffer;
         function initialize() {
             /* todo:
              créer un array buffer (dans la variable positionBuffer)
@@ -87,6 +89,11 @@
             gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
             var javascriptPositions = new Float32Array([-0.5,-0.5,0,0,0.5,0,0.5,-0.5,0]);
             gl.bufferData(gl.ARRAY_BUFFER, javascriptPositions, gl.STATIC_DRAW);
+
+            colorBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER,colorBuffer);
+            var colorValues = new Float32Array([1,0,0,0,1,0,0,0,1]);
+            gl.bufferData(gl.ARRAY_BUFFER, colorValues, gl.STATIC_DRAW);
 
             var vertexShader = getShader("vertexShader", gl.VERTEX_SHADER);
             var fragmentShader = getShader("fragmentShader", gl.FRAGMENT_SHADER);
@@ -121,16 +128,25 @@
                 lancer le draw call
             */
             // On active notre programme
+
             gl.useProgram(program);
-// On active notre buffer de positions
+
             gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-// On récupère la location associée à notre variable position du vertex shader
             var positionLocation = gl.getAttribLocation(program, "position");
-// On indique comment utiliser les données du vertex buffer
             gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
-// On indique que la location sera remplie par un buffer
             gl.enableVertexAttribArray(positionLocation);
-// On demande l'affichage d'un triangle
+
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+            var colorLocation = gl.getAttribLocation(program, "color");
+            gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(colorLocation);
+
+
+
+
+
+
             gl.drawArrays(gl.TRIANGLES, 0, 3);
             requestAnimFrame(render);
         }
