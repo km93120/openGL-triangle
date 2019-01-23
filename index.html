@@ -7,13 +7,17 @@
         attribute vec3 color;
         varying vec3 vColor;
         uniform float counter;
-        uniform float u_time;
         uniform mat4 objectMatrix;
+        uniform mat4 projectionMatrix;
+        uniform mat4 viewMatrix;
 
-        void main() {
 
-            gl_Position = objectMatrix * vec4(position, 1.0);
-            vColor = color;
+        void main()
+        {
+         gl_Position = projectionMatrix * viewMatrix * objectMatrix * vec4(position, 1.0);
+
+
+          vColor = color;
 
         }
 
@@ -169,15 +173,24 @@
 
             var objectMatrix = mat4.create();
             mat4.identity(objectMatrix);
-            mat4.rotateZ(objectMatrix,objectMatrix,++frameCounter*0.01)
-            mat4.rotateX(objectMatrix,objectMatrix,++frameCounter*0.01)
-            mat4.rotateY(objectMatrix,objectMatrix,++frameCounter*0.01)
+            mat4.rotateZ(objectMatrix,objectMatrix,frameCounter*0.01)
+            //mat4.rotateX(objectMatrix,objectMatrix,frameCounter*0.01)
+            //mat4.rotateY(objectMatrix,objectMatrix,frameCounter*0.01)
             var objectMatrixLocation = gl.getUniformLocation(program, "objectMatrix");
             gl.uniformMatrix4fv(objectMatrixLocation, false, objectMatrix);
 
 
+            var projectionMatrix = mat4.create();
+            mat4.identity(projectionMatrix);
+            var projectionMatrixLocation = gl.getUniformLocation(program, "projectionMatrix");
+            mat4.perspective(projectionMatrix, 45, 1, 0.1, 1000);
+            gl.uniformMatrix4fv(projectionMatrixLocation, false, projectionMatrix);
 
-
+            var viewMatrix = mat4.create();
+            mat4.identity(viewMatrix);
+            var viewMatrixLocation = gl.getUniformLocation(program, "viewMatrix");
+            mat4.lookAt(viewMatrix, [0, -1, 1], [0, 0, 0], [0, 0, 1]);
+            gl.uniformMatrix4fv(viewMatrixLocation, false, viewMatrix);
 
             gl.drawArrays(gl.TRIANGLES, 0, 6);
             requestAnimFrame(render);
