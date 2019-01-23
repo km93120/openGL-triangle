@@ -4,18 +4,19 @@
     <title>WebGL</title>
     <script id="vertexShader" type="text/vertex-code">
         attribute vec3 position;
-       // gl_PointSize = 0.0;
-        void main()
-        {
-            gl_Position = vec4(position, 1);
+        varying vec3 vColor;
+        void main() {
+            gl_Position = vec4(position, 1.0);
+            vColor = vec3(position);
         }
 
     </script>
     <script id="fragmentShader" type="text/fragment-code">
+
         precision highp float;
-        void main()
-        {
-            gl_FragColor = vec4(1.0, 0.5, 1.0,1);
+        varying vec3 vColor;
+        void main() {
+            gl_FragColor = vec4(vColor, 1.0);
         }
     </script>
 
